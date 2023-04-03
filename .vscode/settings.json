@@ -1,7 +1,7 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     // Unofficially, QMK uses spaces for indentation
-    "editor.insertSpaces": true,
+    "editor.insertSpaces": false,
     // Configure glob patterns for excluding files and folders.
     "files.exclude": {
         "**/.build": true,
@@ -27,5 +27,138 @@
     "python.formatting.provider": "yapf",
     "[json]": {
 	    "editor.formatOnSave": false
-    }
+    },
+    "terminal.integrated.profiles.windows": {
+        "QMK_MSYS": {
+            "path": "D:/Dev/Keyboard/QMK_MSYS/usr/bin/bash.exe",
+            "env": {
+                "MSYSTEM": "MINGW64",
+                "CHERE_INVOKING": "1"
+            },
+            "args": ["--login"]
+        }
+    },
+
+    "terminal.integrated.cursorStyle": "line",
+    "cmake.configureOnOpen": false,
+
+    "todohighlight.isEnable": true,
+    "todohighlight.isCaseSensitive": true,
+    "todohighlight.keywords": [
+        {
+            "text": "AZURE",
+            "color": "black",
+            "backgroundColor": "#99F5FF",
+            "isWholeLine": false
+        },
+        {
+            "text": "BLACK",
+            "color": "white",
+            "backgroundColor": "#000000",
+            "isWholeLine": false
+        },
+        {
+            "text": "BLUE",
+            "color": "white",
+            "backgroundColor": "#0000FF",
+            "isWholeLine": false
+        },
+        {
+            "text": "CHARTREUSE",
+            "color": "black",
+            "backgroundColor": "#80FF00",
+            "isWholeLine": false
+        },
+        {
+            "text": "CORAL",
+            "color": "black",
+            "backgroundColor": "#FF7C4D",
+            "isWholeLine": false
+        },
+        {
+            "text": "CYAN",
+            "color": "black",
+            "backgroundColor": "#00FFFF",
+            "isWholeLine": false
+        },
+        {
+            "text": "GOLDENROD",
+            "color": "black",
+            "backgroundColor": "#D9A521",
+            "isWholeLine": false
+        },
+        {
+            "text": "GOLD",
+            "color": "black",
+            "backgroundColor": "#FFD900",
+            "isWholeLine": false
+        },
+        {
+            "text": "GREEN",
+            "color": "black",
+            "backgroundColor": "#00FF00",
+            "isWholeLine": false
+        },
+        {
+            "text": "MAGENTA",
+            "color": "black",
+            "backgroundColor": "#FF00FF",
+            "isWholeLine": false
+        },
+        {
+            "text": "ORANGE",
+            "color": "black",
+            "backgroundColor": "#FF8000",
+            "isWholeLine": false
+        },
+        {
+            "text": "PINK",
+            "color": "black",
+            "backgroundColor": "#FF80BF",
+            "isWholeLine": false
+        },
+        {
+            "text": "PURPLE",
+            "color": "white",
+            "backgroundColor": "#7A00FF",
+            "isWholeLine": false
+        },
+        {
+            "text": "RED",
+            "color": "white",
+            "backgroundColor": "#FF0000",
+            "isWholeLine": false
+        },
+        {
+            "text": "SPRINGGREEN",
+            "color": "black",
+            "backgroundColor": "#00FF80",
+            "isWholeLine": false
+        },
+        {
+            "text": "TEAL",
+            "color": "white",
+            "backgroundColor": "#008080",
+            "isWholeLine": false
+        },
+        {
+            "text": "TURQUOISE",
+            "color": "white",
+            "backgroundColor": "#476E6A",
+            "isWholeLine": false
+        },
+        {
+            "text": "WHITE",
+            "color": "black",
+            "backgroundColor": "#FFFFFF",
+            "isWholeLine": false
+        },
+        {
+            "text": "YELLOW",
+            "color": "black",
+            "backgroundColor": "#FFFF00",
+            "isWholeLine": false
+        }
+    ],
+    "editor.detectIndentation": false,
 }
