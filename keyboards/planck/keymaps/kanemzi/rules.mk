@@ -1,9 +1,11 @@
+SRC += layer_config.c
+
 EXTRAFLAGS += -flto
 
 LTO_ENABLE = yes
 
 CONSOLE_ENABLE = yes
-# UNICODEMAP_ENABLE = yes
+UNICODE_ENABLE = yes
 
 DEBOUNCE_TYPE = sym_eager_pr
 

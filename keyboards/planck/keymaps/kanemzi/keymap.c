@@ -1,5 +1,6 @@
 #include QMK_KEYBOARD_H
 
+#include "layers.h"
 #include "layer_base.h"
 #include "layer_lower.h"
 #include "layer_raise.h"
@@ -31,6 +32,14 @@ const uint8_t PROGMEM ledmap[][RGB_MATRIX_LED_COUNT][3] = {
 	[L_CONFIG] = LAYER_CONFIG_LEDMAP
 };
 
+extern layer_info_base;
+
+layer_info_t layers_info[] = {
+    &layer_info_base;
+}
+
+layer_info_t* predominant_layer_info = &layer_info_base;
+
 
 static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
 {
@@ -53,8 +62,28 @@ static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
 	}
 }
 
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-	set_layer_color(led_min, led_max, get_highest_layer(layer_state | default_layer_state));
+/*
+void rgb_matrix_indicators_user(void)
+{
+    if (keyboard_config.disable_layer_led)
+        return;
+}
+*/
+
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max)
+{
+    if (keyboard_config.disable_layer_led)
+        return false;
+
+    uint8_t predominant_layer = get_highest_layer(layer_state | default_layer_state);
+
+    // Default layer coloration
+	set_layer_color(led_min, led_max, predominant_layer);
+
+    // Layers custom dynamic rendering
+
+    // @todo: call layer specific
+
     return false;
 }
 
@@ -70,7 +99,10 @@ void keyboard_post_init_user(void)
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-	/*witch (keycode)
+
+    // @todo: process inputs for current layer
+
+	/*switch (keycode)
 	{
 
 	}*/
