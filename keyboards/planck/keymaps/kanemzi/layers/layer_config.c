@@ -34,7 +34,23 @@ void on_layer_render_config(uint8_t led_min, uint8_t led_max)
 {
 	if (_nkro_enabled)
 	{
-		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 0);
+	}
+
+	switch (_current_unicode_input_mode)
+	{
+		case UNICODE_MODE_WINDOWS:
+			RGB_MATRIX_INDICATOR_SET_COLOR(28, RGB_BLUE);
+			break;
+		case UNICODE_MODE_WINCOMPOSE:
+			RGB_MATRIX_INDICATOR_SET_COLOR(28, RGB_CYAN);
+			break;
+		case UNICODE_MODE_LINUX:
+			RGB_MATRIX_INDICATOR_SET_COLOR(28, RGB_CORAL);
+			break;
+		case UNICODE_MODE_MACOS:
+			RGB_MATRIX_INDICATOR_SET_COLOR(28, RGB_PINK);
+			break;
 	}
 }
 
