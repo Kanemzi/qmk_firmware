@@ -11,13 +11,9 @@ layer_info_t layer_info_config =
 
 static uint8_t _current_unicode_input_mode = 0;
 
-static bool _nkro_enabled = true;
-
 void on_layer_show_config(void)
 {
     _current_unicode_input_mode = get_unicode_input_mode();
-	_nkro_enabled = keymap_config.nkro;
-
 #ifdef CONSOLE_ENABLE
     dprintf("[Config] Show layer");
 #endif
@@ -32,7 +28,7 @@ void on_layer_hide_config(void)
 
 void on_layer_render_config(uint8_t led_min, uint8_t led_max)
 {
-	if (_nkro_enabled)
+	if (keymap_config.nkro)
 	{
 		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 0);
 	}
@@ -65,14 +61,14 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 				return false;
 			}
 			break;
-
+/*
 		case NK_TOGG:
 			if (record->event.pressed)
 			{
 				_nkro_enabled = keymap_config.nkro;
 				return true;
 			}
-			break;
+			break;*/
 	}
 	return true;
 }
