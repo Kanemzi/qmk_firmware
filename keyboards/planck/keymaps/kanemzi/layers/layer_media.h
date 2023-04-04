@@ -2,7 +2,7 @@
 
 #include QMK_KEYBOARD_H
 
-#include "constants.h"
+#include "../constants.h"
 
 /* Media Layer
  * ,-----------------------------------------------------------------------------------.
@@ -22,9 +22,9 @@
     _______,        XXXXXXX,       XXXXXXX,             XXXXXXX,             _______,             XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX  \
 )
 
-#define LAYER_MEDIA_LEDMAP {                                                                   \
-    GOLDENROD, GREEN, GREEN,  PURPLE, GREEN,  BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, \
-    TEAL,      BLACK, PURPLE, PURPLE, PURPLE, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, \
-    BLACK,     BLACK, BLACK,  BLACK, BLACK,   BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, \
-    ORANGE,    BLACK, BLACK,  BLACK, ORANGE,      BLACK,    BLACK, BLACK, BLACK, BLACK, BLACK  \
+#define LAYER_MEDIA_LEDMAP {                                                                    \
+    GOLDENROD, GREEN, GREEN,  PURPLE, GREEN,  BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,  \
+    TEAL,      BLACK, PURPLE, PURPLE, PURPLE, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,  \
+    BLACK,     BLACK, BLACK,  BLACK,  BLACK,   BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, \
+    PURPLE,    BLACK, BLACK,  BLACK,  PURPLE,      BLACK,    BLACK, BLACK, BLACK, BLACK, BLACK  \
 }

@@ -2,7 +2,8 @@
 
 #include QMK_KEYBOARD_H
 
-#include "constants.h"
+#include "../constants.h"
+#include "layers/layers.h"
 
 /* Midi Layer (accordion keyboard layout)
  * ,-----------------------------------------------------------------------------------.
@@ -22,9 +23,15 @@
     XXXXXXX, XXXXXXX, XXXXXXX, MI_SOFT, MI_OCTD, MI_SUST, XXXXXXX, MI_OCTU, XXXXXXX, XXXXXXX, XXXXXXX, KZ_EXIT \
 )
 
-#define LAYER_MIDI_LEDMAP {                                                                 \
-    WHITE, WHITE, TEAL,  WHITE,     WHITE, WHITE, TEAL,  WHITE, WHITE, WHITE, TEAL,  WHITE, \
-    TEAL,  WHITE, WHITE, TEAL,      TEAL,  WHITE, WHITE, TEAL,  TEAL,  WHITE, WHITE, TEAL,  \
-    WHITE, TEAL,  TEAL,  WHITE,     WHITE, TEAL,  TEAL,  WHITE, WHITE, TEAL,  TEAL,  WHITE, \
-    BLACK, BLACK, BLACK, GOLDENROD, PINK,   GOLDENROD,   PINK,  BLACK, BLACK, BLACK, ORANGE \
+#define LAYER_MIDI_LEDMAP {                                                                  \
+    WHITE, WHITE, BLUE,  WHITE,     WHITE, WHITE, BLUE,  WHITE, WHITE, WHITE, BLUE,  WHITE,  \
+    BLUE,  WHITE, WHITE, BLUE,      BLUE,  WHITE, WHITE, BLUE,  BLUE,  WHITE, WHITE, BLUE,   \
+    WHITE, BLUE,  BLUE,  WHITE,     WHITE, BLUE,  BLUE,  WHITE, WHITE, BLUE,  BLUE,  WHITE,  \
+    BLACK, BLACK, BLACK, GOLDENROD, PINK,   GOLDENROD,   PINK,  BLACK, BLACK, BLACK, MAGENTA \
 }
+
+void on_layer_show_midi(void);
+void on_layer_hide_midi(void);
+bool on_process_record_midi(uint16_t keycode, keyrecord_t *record);
+
+extern layer_info_t layer_info_midi;

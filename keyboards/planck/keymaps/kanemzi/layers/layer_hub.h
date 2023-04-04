@@ -2,7 +2,7 @@
 
 #include QMK_KEYBOARD_H
 
-#include "constants.h"
+#include "../constants.h"
 
 /* Hub Layer (access to complex features)
  * ,-----------------------------------------------------------------------------------.
@@ -26,5 +26,5 @@
     BLACK, BLACK, BLACK,  BLACK, BLACK, BLACK, BLACK, BLACK,  BLACK, BLACK,  BLACK, BLACK, \
     BLACK, BLACK, ORANGE, BLACK, BLACK, BLACK, BLACK, BLACK,  BLACK, PURPLE, BLACK, BLACK, \
     BLACK, BLACK, BLACK,  BLACK, BLACK, BLACK, BLACK, BLACK,  BLACK, BLACK,  BLACK, BLACK, \
-    BLACK, BLACK, BLACK,  BLACK, ORANGE,   BLACK,     ORANGE, BLACK, BLACK,  BLACK, BLACK  \
+    BLACK, BLACK, BLACK,  BLACK, PURPLE,   BLACK,     PURPLE, BLACK, BLACK,  BLACK, BLACK  \
 }

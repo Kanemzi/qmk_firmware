@@ -3,6 +3,7 @@
 #include "keymap_french.h"
 
 #include "constants.h"
+#include "layers.h"
 
 /* Base Layer
  * ,-----------------------------------------------------------------------------------.
@@ -23,8 +24,8 @@
 )
 
 #define LAYER_BASE_LEDMAP {\
-    GREEN, WHITE,  WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,  WHITE,  WHITE,  WHITE,  GREEN, \
-    GREEN, WHITE,  WHITE, WHITE, WHITE, WHITE, WHITE, WHITE,  WHITE,  WHITE,  WHITE,  GREEN, \
-    GREEN, WHITE,  WHITE, WHITE, WHITE, WHITE, WHITE, PINK,   PINK,   PINK,   ORANGE, GREEN, \
-    GREEN, ORANGE, GREEN, GREEN, ORANGE,    GREEN,    ORANGE, GREEN,  ORANGE, ORANGE, ORANGE \
+    GREEN, WHITE,  WHITE, WHITE, WHITE,   WHITE, WHITE, WHITE,   WHITE,  WHITE,  WHITE,  GREEN, \
+    GREEN, WHITE,  WHITE, WHITE, WHITE,   WHITE, WHITE, WHITE,   WHITE,  WHITE,  WHITE,  GREEN, \
+    GREEN, WHITE,  WHITE, WHITE, WHITE,   WHITE, WHITE, PINK,    PINK,   PINK,   ORANGE, GREEN, \
+    GREEN, ORANGE, GREEN, GREEN, MAGENTA,     GREEN,    MAGENTA, GREEN,  ORANGE, ORANGE, ORANGE \
 }

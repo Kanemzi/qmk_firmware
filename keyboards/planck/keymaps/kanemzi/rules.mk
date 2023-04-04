@@ -1,4 +1,5 @@
-SRC += layer_config.c
+SRC += layers/layer_config.c
+SRC += layers/layer_midi.c
 
 EXTRAFLAGS += -flto
 

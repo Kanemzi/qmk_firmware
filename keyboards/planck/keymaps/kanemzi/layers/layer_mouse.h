@@ -2,7 +2,7 @@
 
 #include QMK_KEYBOARD_H
 
-#include "constants.h"
+#include "../constants.h"
 
 /* Mouse Layer
  * ,-----------------------------------------------------------------------------------.
@@ -26,5 +26,5 @@
     BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,      CHARTREUSE, CORAL,       CHARTREUSE, BLACK, BLACK, \
     BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, CHARTREUSE, CORAL,      CORAL,       CORAL,      BLACK, BLACK, \
     BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK,      BLACK,      BLACK,       BLACK,      BLACK, BLACK, \
-    BLACK, BLACK, BLACK, BLACK, BLACK,    BLACK,          ORANGE,     SPRINGGREEN, BLACK,      BLACK, ORANGE \
+    BLACK, BLACK, BLACK, BLACK, BLACK,    BLACK,          PURPLE,     SPRINGGREEN, BLACK,      BLACK, PURPLE \
 }

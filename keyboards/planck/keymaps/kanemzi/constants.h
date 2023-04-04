@@ -2,7 +2,7 @@
 
 #include QMK_KEYBOARD_H
 
-enum planck_layers
+typedef enum planck_layers
 {
     L_BASE = 0,
     L_LOWER,
@@ -12,7 +12,7 @@ enum planck_layers
     L_MOUSE,
     L_MIDI,
     L_CONFIG
-};
+} planck_layers;
 
 enum planck_keycodes
 {
