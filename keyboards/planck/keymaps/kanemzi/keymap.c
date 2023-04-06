@@ -44,6 +44,7 @@ layer_info_t* layers_info[] = {
 };
 
 planck_layers predominant_layer = L_BASE;
+user_config_t user_config;
 
 static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
 {
@@ -95,7 +96,7 @@ layer_state_t layer_state_set_user(layer_state_t state)
 {
 	layer_state_t new_state = update_tri_layer_state(state, L_LOWER, L_RAISE, L_HUB);
 	planck_layers new_predominant_layer = get_highest_layer(new_state | default_layer_state);
-	
+
 	// If the current predominant layer changed
 	if (new_predominant_layer != predominant_layer)
 	{
@@ -127,6 +128,7 @@ layer_state_t layer_state_set_user(layer_state_t state)
 
 void keyboard_post_init_user(void)
 {
+    user_config.raw = eeconfig_read_user();
     rgb_matrix_enable();
 }
 

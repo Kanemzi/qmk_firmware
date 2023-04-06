@@ -33,7 +33,11 @@ void on_layer_render_config(uint8_t led_min, uint8_t led_max)
 		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 0);
 	}
 
-	switch (_current_unicode_input_mode)
+    if (user_config.windows_unicode_fallback)
+    {
+        RGB_MATRIX_INDICATOR_SET_COLOR(28, 255, 0, 0);
+    }
+    else switch (_current_unicode_input_mode)
 	{
 		case UNICODE_MODE_WINDOWS:
 			RGB_MATRIX_INDICATOR_SET_COLOR(28, 0, 0, 255);
@@ -61,6 +65,18 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 				return false;
 			}
 			break;
+
+        case UC_NEXT:
+            if ((get_mods() | get_weak_mods()) & MOD_MASK_SHIFT)
+            {
+                user_config.windows_unicode_fallback = true;
+                return false;
+            }
+            else
+            {
+                user_config.windows_unicode_fallback = false;
+            }
+            break;
 /*
 		case NK_TOGG:
 			if (record->event.pressed)

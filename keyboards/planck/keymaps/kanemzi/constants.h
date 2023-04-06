@@ -16,9 +16,10 @@ typedef enum planck_layers
 
 enum planck_keycodes
 {
-    KZ_EXIT = SAFE_RANGE,
-    KZ_MS_WHEEL_MODE,
-    KZ_CFG_SAVE
+    KZ_EXIT = SAFE_RANGE, // Exit any persistent layer (configuration panel, midi keyboard)
+    KZ_MS_WHEEL_MODE, // While held, change the mouse arrows mode from "move" to "wheel"
+    KZ_CFG_SAVE, // Save the current configuration if dirty
+    KZ_MI_ALT, // While held, enables the alternative control row on midi keyboard
 };
 
 /* colors */
@@ -41,3 +42,13 @@ enum planck_keycodes
 #define TURQUOISE {RGB_TURQUOISE}
 #define WHITE {RGB_WHITE}
 #define YELLOW {RGB_YELLOW}
+
+typedef union
+{
+    uint32_t raw;
+    struct {
+        bool windows_unicode_fallback :1; // Whether or not the keyboard should use the shitty Windows alt+decimal alternative to unicode (when possible)
+    };
+} user_config_t;
+
+extern user_config_t user_config;
