@@ -19,7 +19,7 @@ enum planck_keycodes
     KZ_EXIT = SAFE_RANGE, // Exit any persistent layer (configuration panel, midi keyboard)
     KZ_MS_WHEEL_MODE, // While held, change the mouse arrows mode from "move" to "wheel"
     KZ_CFG_SAVE, // Save the current configuration if dirty
-    KZ_MI_ALT, // While held, enables the alternative control row on midi keyboard
+    KZ_MI_ALT // While held, enables the alternative control row on midi keyboard
 };
 
 typedef enum unicode_names
@@ -45,7 +45,7 @@ typedef enum unicode_names
     CCEDCAP,
     OE,
     OECAP,
-    TM,
+    TM
 } unicode_names;
 
 /* colors */
@@ -77,9 +77,17 @@ typedef union
     };
 } user_config_t;
 
+typedef struct
+{
+	uint16_t keycode;
+	uint16_t shifted_keycode;
+} custom_shift_key_t;
+
 extern user_config_t user_config;
-extern const uint32_t unicode_map[] PROGMEM;
 
 #define ALT_SEQ_END 10
 #define ALT_NO_SEQ {ALT_SEQ_END, 0, 0}
 extern const uint8_t windows_unicode_fallback_map[][3] PROGMEM;
+extern const uint32_t unicode_map[] PROGMEM;
+
+extern const custom_shift_key_t custom_shift_keys[] PROGMEM;

@@ -2,7 +2,7 @@
 
 layer_info_t layer_info_config =
 {
-    ._predominant = false,
+    .is_predominant = false,
     .on_layer_show = on_layer_show_config,
     .on_layer_hide = on_layer_hide_config,
     .on_layer_render = on_layer_render_config,
@@ -28,6 +28,11 @@ void on_layer_render_config(uint8_t led_min, uint8_t led_max)
 	if (keymap_config.nkro)
 	{
 		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 0);
+	}
+
+	if (debug_enable)
+	{
+		RGB_MATRIX_INDICATOR_SET_COLOR(27, 0, 255, 0);
 	}
 
     if (user_config.windows_unicode_fallback)
@@ -64,15 +69,22 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 			break;
 
         case UC_NEXT:
-            if (get_mods() & MOD_MASK_SHIFT)
-            {
-                user_config.windows_unicode_fallback = true;
-                return false;
-            }
-            else
-            {
-                user_config.windows_unicode_fallback = false;
-            }
+			if (record->event.pressed)
+			{
+				if (get_mods() & MOD_MASK_SHIFT)
+				{
+					user_config.windows_unicode_fallback ^= 1;
+					return false;
+				}
+				else
+				{
+					if (user_config.windows_unicode_fallback)
+					{
+						user_config.windows_unicode_fallback = false;
+						return false;
+					}
+				}
+			}
             break;
 /*
 		case NK_TOGG:

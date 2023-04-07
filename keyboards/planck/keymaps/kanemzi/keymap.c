@@ -46,7 +46,7 @@ layer_info_t* layers_info[] = {
 planck_layers predominant_layer = L_BASE;
 user_config_t user_config;
 
-const uint32_t unicode_map[] PROGMEM = {
+const uint32_t PROGMEM unicode_map[] = {
     [GMTL] =    0x00ab, // «
     [GMTR] =    0x00bb, // »
     [HCADR] =   0x2013, // –
@@ -68,10 +68,10 @@ const uint32_t unicode_map[] PROGMEM = {
     [CCEDCAP] = 0x00c7, // Ç
     [OE] =      0x0153, // œ
     [OECAP] =   0x0152, // Œ
-    [TM] =      0x2122, // ™
+    [TM] =      0x2122 // ™
 };
 
-const uint8_t windows_unicode_fallback_map[][3] PROGMEM = {
+const uint8_t PROGMEM windows_unicode_fallback_map[][3] = {
     [GMTL] =    {1, 7, 1}, // «
     [GMTR] =    {1, 8, 7}, // »
     [HCADR] =   {1, 5, 0}, // –
@@ -93,7 +93,33 @@ const uint8_t windows_unicode_fallback_map[][3] PROGMEM = {
     [CCEDCAP] = {1, 9, 9}, // Ç
     [OE] =      {1, 5, 6}, // œ
     [OECAP] =   {1, 4, 0}, // Œ
-    [TM] =      {1, 5, 3}, // ™
+    [TM] =      {1, 5, 3} // ™
+};
+
+#define CUSTOM_SHIFT_KEYS_COUNT 19
+const custom_shift_key_t PROGMEM custom_shift_keys[] = {
+	{FR_AGRV, X(AGRVCAP)},
+	{FR_EACU, X(EACUCAP)},
+	{FR_EGRV, X(EGRVCAP)},
+	{FR_UGRV, X(UGRVCAP)},
+	{FR_CCED, X(CCEDCAP)},
+
+	{FR_QUOT, X(TM)},
+	{FR_LABK, X(GMTL)},
+	{FR_RABK, X(GMTR)},
+
+	{X(HCADR), X(CADR)},
+
+	{KC_KP_0, X(EXP0)},
+	{KC_KP_1, X(EXP1)},
+	{KC_KP_2, FR_SUP2},
+	{KC_KP_3, X(EXP3)},
+	{KC_KP_4, X(EXP4)},
+	{KC_KP_5, X(EXP5)},
+	{KC_KP_6, X(EXP6)},
+	{KC_KP_7, X(EXP7)},
+	{KC_KP_8, X(EXP8)},
+	{KC_KP_9, X(EXP9)}
 };
 
 static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
@@ -182,8 +208,122 @@ void keyboard_post_init_user(void)
     rgb_matrix_enable();
 }
 
+void send_windows_alt_sequence(uint16_t keycode)
+{
+	const uint16_t index = unicodemap_index(keycode);
+	const uint8_t first_digit = windows_unicode_fallback_map[index][0];
+	if (first_digit == ALT_SEQ_END)
+	{
+		#ifdef CONSOLE_ENABLE
+    		dprintf("No Alt Sequence fallback for index %d):", index);
+		#endif
+		return;
+	}
+
+	const uint8_t saved_mods = get_mods();
+	clear_mods();
+	register_code(KC_LALT);
+	#ifdef CONSOLE_ENABLE
+    	dprintf("Starting Alt Sequence (index: %d):", index);
+	#endif
+	tap_code(KC_KP_0); // First sequence digit is always 0
+	for (size_t i = 0; i < 3 ; i++)
+	{
+		const uint8_t digit = windows_unicode_fallback_map[index][i];
+		#ifdef CONSOLE_ENABLE
+			dprintf("%d ", digit);
+		#endif
+		if (digit == ALT_SEQ_END)
+			break;
+
+		uint16_t keycode = KC_KP_0;
+		if (digit > 0)
+			keycode = KC_KP_1 + digit - 1;
+
+		tap_code(keycode);
+	}
+	unregister_code(KC_LALT);
+	#ifdef CONSOLE_ENABLE
+    	dprintf("\n");
+	#endif
+	set_mods(saved_mods);
+}
+
+bool process_custom_shift_keys(uint16_t keycode, keyrecord_t* record)
+{
+	static uint16_t registered_keycode = KC_NO;
+
+	if (registered_keycode != KC_NO)
+	{
+		unregister_code16(registered_keycode);
+		registered_keycode = KC_NO;
+	}
+
+	if (!record->event.pressed)
+		return true;
+
+	const uint8_t mods = get_mods();
+
+	if ((mods | get_weak_mods()) & MOD_MASK_SHIFT)
+	{
+		// if ((IS_QK_MOD_TAP(keycode) || IS_QK_LAYER_TAP(keycode)) && record->tap.count == 0)
+        //		return true;
+
+		for (uint8_t i = 0; i < CUSTOM_SHIFT_KEYS_COUNT; i++)
+		{
+			if (keycode == custom_shift_keys[i].keycode)
+			{
+				#ifdef CONSOLE_ENABLE
+					dprintf("Detected custom shift key");
+				#endif
+				registered_keycode = custom_shift_keys[i].shifted_keycode;
+
+				if (IS_QK_MODS(registered_keycode) && (QK_MODS_GET_MODS(registered_keycode) & MOD_LSFT) != 0)
+				{
+					register_code16(registered_keycode);
+				}
+				else
+				{
+					del_weak_mods(MOD_MASK_SHIFT);
+					unregister_mods(MOD_MASK_SHIFT);
+					if (IS_QK_UNICODEMAP(registered_keycode))
+					{
+						if (user_config.windows_unicode_fallback)
+						{
+							send_windows_alt_sequence(registered_keycode);
+						}
+						else
+						{
+							process_unicodemap(registered_keycode, record);
+						}
+					}
+					else
+					{
+						register_code16(registered_keycode);
+					}
+					set_mods(mods);
+				}
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record)
 {
+	if (!process_custom_shift_keys(keycode, record))
+		return false;
+
+	if (IS_QK_UNICODEMAP(keycode) && record->event.pressed)
+	{
+		if (user_config.windows_unicode_fallback)
+		{
+			send_windows_alt_sequence(keycode);
+			return false;
+		}
+	}
+
 	// Per layer custom record handling
 	layer_info_t* predominant_layer_info = layers_info[predominant_layer];
 	if (predominant_layer_info != NULL && predominant_layer_info->on_process_record != NULL)
