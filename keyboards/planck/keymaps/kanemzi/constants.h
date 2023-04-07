@@ -22,6 +22,32 @@ enum planck_keycodes
     KZ_MI_ALT, // While held, enables the alternative control row on midi keyboard
 };
 
+typedef enum unicode_names
+{
+    GMTL,
+    GMTR,
+    CADR,
+    HCADR,
+    MIDDOT,
+    EXP0,
+    EXP1,
+    EXP3,
+    EXP4,
+    EXP5,
+    EXP6,
+    EXP7,
+    EXP8,
+    EXP9,
+    AGRVCAP,
+    EACUCAP,
+    EGRVCAP,
+    UGRVCAP,
+    CCEDCAP,
+    OE,
+    OECAP,
+    TM,
+} unicode_names;
+
 /* colors */
 #define AZURE {RGB_AZURE}
 #define BLACK {RGB_BLACK}
@@ -52,3 +78,8 @@ typedef union
 } user_config_t;
 
 extern user_config_t user_config;
+extern const uint32_t unicode_map[] PROGMEM;
+
+#define ALT_SEQ_END 10
+#define ALT_NO_SEQ {ALT_SEQ_END, 0, 0}
+extern const uint8_t windows_unicode_fallback_map[][3] PROGMEM;

@@ -2,18 +2,15 @@
 
 layer_info_t layer_info_config =
 {
-    .is_predominant = false,
+    ._predominant = false,
     .on_layer_show = on_layer_show_config,
     .on_layer_hide = on_layer_hide_config,
     .on_layer_render = on_layer_render_config,
     .on_process_record = on_process_record_config
 };
 
-static uint8_t _current_unicode_input_mode = 0;
-
 void on_layer_show_config(void)
 {
-    _current_unicode_input_mode = get_unicode_input_mode();
 #ifdef CONSOLE_ENABLE
     dprintf("[Config] Show layer");
 #endif
@@ -37,7 +34,7 @@ void on_layer_render_config(uint8_t led_min, uint8_t led_max)
     {
         RGB_MATRIX_INDICATOR_SET_COLOR(28, 255, 0, 0);
     }
-    else switch (_current_unicode_input_mode)
+    else switch (get_unicode_input_mode())
 	{
 		case UNICODE_MODE_WINDOWS:
 			RGB_MATRIX_INDICATOR_SET_COLOR(28, 0, 0, 255);
@@ -67,7 +64,7 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 			break;
 
         case UC_NEXT:
-            if ((get_mods() | get_weak_mods()) & MOD_MASK_SHIFT)
+            if (get_mods() & MOD_MASK_SHIFT)
             {
                 user_config.windows_unicode_fallback = true;
                 return false;
@@ -87,12 +84,4 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 			break;*/
 	}
 	return true;
-}
-
-void unicode_input_mode_set_user(uint8_t input_mode)
-{
-    if (!layer_info_config.is_predominant)
-        return;
-
-    _current_unicode_input_mode = input_mode;
 }

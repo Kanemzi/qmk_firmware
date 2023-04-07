@@ -46,6 +46,56 @@ layer_info_t* layers_info[] = {
 planck_layers predominant_layer = L_BASE;
 user_config_t user_config;
 
+const uint32_t unicode_map[] PROGMEM = {
+    [GMTL] =    0x00ab, // «
+    [GMTR] =    0x00bb, // »
+    [HCADR] =   0x2013, // –
+    [CADR] =    0x2014, // —
+    [MIDDOT] =  0x00b7, // ·
+    [EXP0] =    0x2070, // ⁰
+    [EXP1] =    0x00b9, // ¹
+    [EXP3] =    0x00b3, // ³
+    [EXP4] =    0x2074, // ⁴
+    [EXP5] =    0x2075, // ⁵
+    [EXP6] =    0x2076, // ⁶
+    [EXP7] =    0x2077, // ⁷
+    [EXP8] =    0x2078, // ⁸
+    [EXP9] =    0x2079, // ⁹
+    [AGRVCAP] = 0x00c0, // À
+    [EACUCAP] = 0x00c9, // É
+    [EGRVCAP] = 0x00c8, // È
+    [UGRVCAP] = 0x00d9, // Ù
+    [CCEDCAP] = 0x00c7, // Ç
+    [OE] =      0x0153, // œ
+    [OECAP] =   0x0152, // Œ
+    [TM] =      0x2122, // ™
+};
+
+const uint8_t windows_unicode_fallback_map[][3] PROGMEM = {
+    [GMTL] =    {1, 7, 1}, // «
+    [GMTR] =    {1, 8, 7}, // »
+    [HCADR] =   {1, 5, 0}, // –
+    [CADR] =    {1, 5, 1}, // —
+    [MIDDOT] =  {1, 8, 3}, // ·
+    [EXP0] =    ALT_NO_SEQ, // ⁰
+    [EXP1] =    {1, 8, 5}, // ¹
+    [EXP3] =    {1, 7, 9}, // ³
+    [EXP4] =    ALT_NO_SEQ, // ⁴
+    [EXP5] =    ALT_NO_SEQ, // ⁵
+    [EXP6] =    ALT_NO_SEQ, // ⁶
+    [EXP7] =    ALT_NO_SEQ, // ⁷
+    [EXP8] =    ALT_NO_SEQ, // ⁸
+    [EXP9] =    ALT_NO_SEQ, // ⁹
+    [AGRVCAP] = {1, 9, 2}, // À
+    [EACUCAP] = {2, 0, 1}, // É
+    [EGRVCAP] = {2, 0, 0}, // È
+    [UGRVCAP] = {2, 1, 7}, // Ù
+    [CCEDCAP] = {1, 9, 9}, // Ç
+    [OE] =      {1, 5, 6}, // œ
+    [OECAP] =   {1, 4, 0}, // Œ
+    [TM] =      {1, 5, 3}, // ™
+};
+
 static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
 {
 	for (uint16_t i = led_min; i < led_max; i++)
