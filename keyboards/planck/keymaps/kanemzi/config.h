@@ -2,7 +2,7 @@
 
 //#define LAYER_STATE_8BIT
 
-#define DEBOUNCE 10 // Debounce is Eager 10ms
+#define DEBOUNCE 20 // Debounce is Eager 20ms
 
 /* Sleep */
 #undef RGB_MATRIX_TIMEOUT

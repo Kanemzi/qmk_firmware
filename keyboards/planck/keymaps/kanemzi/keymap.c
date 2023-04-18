@@ -10,6 +10,8 @@
 #include "layers/layer_midi.h"
 #include "layers/layer_config.h"
 
+#include "sendstring_french.h"
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[L_BASE] = LAYER_BASE_GRID,
 	[L_LOWER] = LAYER_LOWER_GRID,
@@ -205,6 +207,7 @@ layer_state_t layer_state_set_user(layer_state_t state)
 void keyboard_post_init_user(void)
 {
     user_config.raw = eeconfig_read_user();
+	user_config.windows_unicode_fallback = true; // Enabled by default until the value is saved in EEPROM
     rgb_matrix_enable();
 }
 
@@ -332,6 +335,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 		{
 			return false;
 		}
+	}
+
+	switch (keycode)
+	{
+		case KZ_ARROW: if (record->event.pressed) SEND_STRING("->");
 	}
 
 	return true;

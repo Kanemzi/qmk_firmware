@@ -17,9 +17,10 @@ typedef enum planck_layers
 enum planck_keycodes
 {
     KZ_EXIT = SAFE_RANGE, // Exit any persistent layer (configuration panel, midi keyboard)
+	KZ_ARROW, // Macro to print "->"
     KZ_MS_WHEEL_MODE, // While held, change the mouse arrows mode from "move" to "wheel"
     KZ_CFG_SAVE, // Save the current configuration if dirty
-    KZ_MI_ALT // While held, enables the alternative control row on midi keyboard
+    KZ_MI_GAME, // Start music minigame
 };
 
 typedef enum unicode_names
