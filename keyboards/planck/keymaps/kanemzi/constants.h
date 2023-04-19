@@ -21,6 +21,8 @@ enum planck_keycodes
     KZ_MS_WHEEL_MODE, // While held, change the mouse arrows mode from "move" to "wheel"
     KZ_CFG_SAVE, // Save the current configuration if dirty
     KZ_MI_GAME, // Start music minigame
+    KZ_MI_GAME_REPLAY, // Replay the current notes sequence
+    KZ_MI_GAME_NEXT, // Go to the next notes sequence (will continue automatically if answered correctly)
 };
 
 typedef enum unicode_names

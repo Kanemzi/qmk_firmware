@@ -3,6 +3,7 @@
 typedef struct
 {
 	bool started : 1;
+    midi_game_config_t config;
 } midi_game_data_t;
 
 static midi_game_data_t midi_game;
@@ -17,19 +18,46 @@ layer_info_t layer_info_midi =
     .on_process_record = on_process_record_midi
 };
 
+#pragma region MIDI_GAME
+
 static void _start_midi_game(void)
 {
 	if (midi_game.started) return;
-
 	midi_game.started = true;
+    srand(timer_read32());
+    tap_code16(MI_OC2); // reset octave
 }
 
 static void _stop_midi_game(void)
 {
 	if (!midi_game.started) return;
-
 	midi_game.started = false;
+
 }
+
+static void _update_midi_game(void)
+{
+    if (!midi_game.started) return;
+
+
+}
+
+// fills the buffer passed in parameter with a random note batch based on the current game config
+static void _generate_random_note_batch(uint16_t* out_batch_buffer, bool* out_is_simultaneous)
+{
+    // First generate a list of intervals (taking into account ascending/descending config values )
+
+    // Compute the "boundaries" of this interval sequence, then define the index range where it can be placed on the keyboard
+
+    // Pick a random index, and define if the notes should be played simultaneously (max 3)
+}
+
+static uint8_t _get_led_index_from_midi_note(uint16_t midi_keycode)
+{
+    if (midi_keycode < MI_C || midi_keycode > MI_B2) return 0xff;
+}
+
+#pragma endregion MIDI_GAME
 
 void on_layer_show_midi(void)
 {
@@ -37,6 +65,11 @@ void on_layer_show_midi(void)
 #ifdef CONSOLE_ENABLE
     dprintf("[Midi] Show layer");
 #endif
+
+    // Setup default configuration for the Midi Game
+    midi_game.config.tempo = 7;
+	midi_game.config.notes_batch_length = 2;
+	midi_game.config.allowed_batch_types = ASCENDING | DESCENDING | SIMULTANEOUS;
 }
 
 void on_layer_hide_midi(void)
@@ -55,6 +88,9 @@ void on_layer_render_midi(uint8_t led_min, uint8_t led_max)
 
 	if (midi_game.started)
 	{
+        // Update the Midi Game state before renreding
+        // @todo could be done in an on_update callback
+        _update_midi_game();
 		// Midi Game rendering logic
 		RGB_MATRIX_INDICATOR_SET_COLOR(45, 255, 0, 0);
 	}
@@ -68,6 +104,9 @@ bool on_process_record_midi(uint16_t keycode, keyrecord_t *record)
 {
 	switch (keycode)
 	{
+        case MI_OCN2 ... MI_OCTU:
+            if (midi_game.started) return false; // Forbid octave variations during the game
+            break;
 		case KZ_MI_GAME:
 			if (!midi_game.started) // needs to hold the key to start game (to avoid missclicks)
 			{
