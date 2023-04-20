@@ -1,12 +1,5 @@
 #include "layer_midi.h"
 
-typedef struct
-{
-	bool started : 1;
-    midi_game_config_t config;
-} midi_game_data_t;
-
-static midi_game_data_t midi_game;
 static uint16_t midi_game_key_press_time = 0;
 
 layer_info_t layer_info_midi =
@@ -19,6 +12,24 @@ layer_info_t layer_info_midi =
 };
 
 #pragma region MIDI_GAME
+
+typedef struct
+{
+	bool started : 1;
+    bool player_turn: 1;
+    uint16_t timer; // multi purpose timer (used for delays and timing note batches)
+
+    uint16_t current_notes_batch[MI_GAME_BATCH_MAX_LENGTH];
+    bool current_is_simultaneous:1;
+
+    uint8_t wrong_inputs[MI_GAME_MAX_MISTAKES];
+    uint8_t correct_inputs[MI_GAME_BATCH_MAX_LENGTH];
+
+    uint8_t
+    midi_game_config_t config;
+} midi_game_data_t;
+
+static midi_game_data_t midi_game;
 
 static void _start_midi_game(void)
 {
@@ -40,6 +51,12 @@ static void _update_midi_game(void)
     if (!midi_game.started) return;
 
 
+}
+
+static bool _on_process_record_midi_game(uint16_t keycode, keyrecord_t *record)
+{
+    // @note: don't count correct note again if replaying it
+    return false;
 }
 
 // fills the buffer passed in parameter with a random note batch based on the current game config

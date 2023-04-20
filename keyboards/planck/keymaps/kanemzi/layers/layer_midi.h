@@ -34,11 +34,28 @@
 #define MI_GAME_KEY_HOLD_TIME_MS 500
 #define MI_GAME_BATCH_MAX_LENGTH 7
 #define MI_GAME_NOTE_DURATION_MS 250
+#define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 250
 #define MI_GAME_DELAY_BETWEEN_BATCHES_MS 1000 // When answered correctly, waits for this amount of time before starting the next note batch
+#define MI_GAME_MAX_MISTAKES 10 // Maximum number of mistakes before automatically switching to the next batch
 
 /* 						Midi Game rules
  * Sequence length == 2: allows all sequence mods
  * Sequence length >= 3: forbid simultaneous notes
+ *
+ *
+ * Game flow:
+ *
+ * - Loop
+ *  - Wait some time
+ *  - Random batch is played
+ *  - Waits for key input
+ *    - Depending on rules, mark mistake after each input (consider notes order or not)
+ *    - If max mistakes reached, loop
+ *    - If correct input and rules consider order, clear mistakes list
+ *    - If all batch notes played and valid, loop
+ *
+ * - At any time, player can skip with KZ_MI_GAME_NEXT key
+ * - At any time, if KZ_MI_GAME_REPLAY is pressed, restart loop but without timing and with the same batch
  */
 
 typedef enum
