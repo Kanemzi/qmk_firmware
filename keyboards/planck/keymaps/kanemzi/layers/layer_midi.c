@@ -23,8 +23,14 @@ typedef struct
     uint16_t current_notes_batch[MI_GAME_BATCH_MAX_LENGTH];
     bool current_is_simultaneous:1;
 
+    // Cached values to avoid computing them each update
+    uint16_t _note_duration;
+    uint16_t _delay_between_notes;
+
     uint8_t wrong_inputs[MI_GAME_MAX_MISTAKES];
     uint8_t correct_inputs[MI_GAME_BATCH_MAX_LENGTH];
+    uint16_t played_notes_mask;
+
 
     midi_game_config_t config;
 } midi_game_data_t;
@@ -74,10 +80,34 @@ static void _update_midi_game(uint16_t current_time)
 		{
 			// Wait a bit before playing the batch (if replay requested, just start directly)
 			if (play_elapsed_time < MI_GAME_DELAY_BETWEEN_BATCHES_MS) return;
-			else play_elasped_time -= MI_GAME_DELAY_BETWEEN_BATCHES_MS;
+			else play_elapsed_time -= MI_GAME_DELAY_BETWEEN_BATCHES_MS;
 		}
 
+        // Play and release the notes in the current batch
+        for (uint8_t i = 0; i < MI_GAME_BATCH_MAX_LENGTH && midi_game.current_notes_batch[i] != 0; i++)
+        {
+            const uint16_t note = midi_game.current_notes_batch[i];
+            const uint16_t note_start_time = i * midi_game._delay_between_notes;
+            const uint16_t note_stop_time = note_start_time + midi_game._note_duration;
 
+            const bool is_currently_played = midi_game.played_notes_mask & (1 << i);
+            const bool should_be_played = play_elapsed_time >= note_start_time && play_elapsed_time <= note_stop_time;
+
+            if (is_currently_played != should_be_played) // The note must be updated
+            {
+                if (should_be_played) register_code16(note);
+                else unregister_code16(note);
+                // Update the played note mask state by overriding the bit corresponding to the note
+                midi_game.played_notes_mask = (midi_game.played_notes_mask & ~(1 << i)) | ((should_be_played & 1) << i);
+                dprintf("[Midi Game] played_notes_mask update : 0x%04x", midi_game.played_notes_mask);
+            }
+        }
+
+        // Detect when we are done playing the batch
+        if (play_elapsed_time >= midi_game._note_duration && midi_game.played_notes_mask)
+        {
+            midi_game.player_turn = true;
+        }
 	}
 }
 
@@ -93,15 +123,29 @@ static void _play_notes_batch(bool replay)
 		_generate_random_note_batch(&midi_game.current_notes_batch, &midi_game.current_is_simultaneous);
 		memset(wrong_inputs, UINT8_MAX, sizeof(wrong_inputs));
     	memset(correct_inputs, UINT8_MAX, sizeof(correct_inputs));
+        midi_game._note_duration = midi_game.current_is_simultaneous ? MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS : MI_GAME_NOTE_DURATION_MS;
 	}
 
+    if (!midi_game.current_is_simultaneous)
+    {
+        const uint16_t bpm = ((float) midi_game.config.tempo / (MI_GAME_TEMPO_STEPS - 1)) * (MI_GAME_MAX_TEMPO - MI_GAME_MIN_TEMPO) + MI_GAME_MIN_TEMPO;
+        midi_game._delay_between_notes = 60000 / bpm;
+        dprintf("[Midi Game] Playing note batch at %dBPM (%dms)", bpm, midi_game._delay_between_notes);
+    }
+    else
+    {
+        midi_game._delay_between_notes = 0;
+        dprintf("[Midi Game] Playing simultaneous notes batch");
+    }
+
+    midi_game.played_notes_mask = 0;
 	tap_code16(QK_MIDI_ALL_NOTES_OFF);
 }
 
 static bool _on_process_record_midi_game(uint16_t keycode, keyrecord_t *record)
 {
 	if (!midi_game.started) return true;
-    // @note: don't count correct note again if replaying it
+
 
 	switch (keycode)
 	{
@@ -114,6 +158,9 @@ static bool _on_process_record_midi_game(uint16_t keycode, keyrecord_t *record)
 		case KZ_MI_GAME_NEXT:
 			if (record->event.pressed) _play_notes_batch(false);
 			return false;
+        case MI_C ... MI_B2:
+            break; // @note: don't count correct note again if replaying it
+
 	}
 
     return true;
@@ -146,7 +193,7 @@ void on_layer_show_midi(void)
 #endif
 
     // Setup default configuration for the Midi Game
-    midi_game.config.tempo = 7;
+    midi_game.config.tempo = 6;
 	midi_game.config.notes_batch_length = 2;
 	midi_game.config.allowed_batch_types = ASCENDING | DESCENDING | SIMULTANEOUS;
 }

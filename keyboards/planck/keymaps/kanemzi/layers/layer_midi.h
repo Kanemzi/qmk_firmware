@@ -32,9 +32,12 @@
 }
 
 #define MI_GAME_KEY_HOLD_TIME_MS 500
-#define MI_GAME_BATCH_MAX_LENGTH 7
-#define MI_GAME_NOTE_DURATION_MS 250
-#define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 250
+#define MI_GAME_MIN_TEMPO 60
+#define MI_GAME_MAX_TEMPO 400
+#define MI_GAME_TEMPO_STEPS 8
+#define MI_GAME_BATCH_MAX_LENGTH 7 // Can't be larger than 16
+#define MI_GAME_NOTE_DURATION_MS 500
+#define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 1000
 #define MI_GAME_DELAY_BETWEEN_BATCHES_MS 1000 // When answered correctly, waits for this amount of time before starting the next note batch
 #define MI_GAME_MAX_MISTAKES 10 // Maximum number of mistakes before automatically switching to the next batch
 
