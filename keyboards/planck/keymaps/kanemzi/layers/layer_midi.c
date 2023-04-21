@@ -15,24 +15,26 @@ layer_info_t layer_info_midi =
 
 typedef struct
 {
+    midi_game_config_t config;
+
 	bool started : 1;
     bool player_turn: 1;
 	bool is_replaying: 1; // set to 1 if currently replaying a batch
-    uint16_t play_start_time; // used for multi purpose timing (waiting and timing note batches)
 
+    // Generated batch info
     uint16_t current_notes_batch[MI_GAME_BATCH_MAX_LENGTH];
-    bool current_is_simultaneous:1;
+    bool current_is_simultaneous;
 
-    // Cached values to avoid computing them each update
+    // Play batch
     uint16_t _note_duration;
     uint16_t _delay_between_notes;
-
-    uint8_t wrong_inputs[MI_GAME_MAX_MISTAKES];
-    uint8_t correct_inputs[MI_GAME_BATCH_MAX_LENGTH];
+    uint16_t play_start_time; // used for multi purpose timing (waiting and timing note batches)
     uint16_t played_notes_mask;
 
-
-    midi_game_config_t config;
+    // Player input handling
+    uint8_t next_guess_index; // The index of the next note to find in the batch (used as a counter for simultaneous batches)
+    uint8_t wrong_input_count;
+    uint8_t wrong_inputs[MI_GAME_MAX_MISTAKES];
 } midi_game_data_t;
 
 static midi_game_data_t midi_game;
@@ -40,6 +42,8 @@ static midi_game_data_t midi_game;
 // fills the buffer passed in parameter with a random note batch based on the current game config
 static void _generate_random_note_batch(uint16_t* out_batch_buffer, bool* out_is_simultaneous)
 {
+    // @note : can't pick the same note multiple time in the same batch
+
     // First generate a list of intervals (taking into account ascending/descending config values )
 
     // Compute the "boundaries" of this interval sequence, then define the index range where it can be placed on the keyboard
@@ -121,10 +125,15 @@ static void _play_notes_batch(bool replay)
 	if (!replay) // If not replaying, start a new round
 	{
 		_generate_random_note_batch(&midi_game.current_notes_batch, &midi_game.current_is_simultaneous);
-		memset(wrong_inputs, UINT8_MAX, sizeof(wrong_inputs));
-    	memset(correct_inputs, UINT8_MAX, sizeof(correct_inputs));
+        midi_game.wrong_input_count = 0;
+		memset(midi_game.wrong_inputs, UINT8_MAX, sizeof(midi_game.wrong_inputs));
+    	memset(midi_game.correct_inputs, UINT8_MAX, sizeof(midi_game.correct_inputs));
         midi_game._note_duration = midi_game.current_is_simultaneous ? MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS : MI_GAME_NOTE_DURATION_MS;
-	}
+
+        // Auto guess the first note (as a reference pitch), it's allowed to press it but optional
+        midi_game.next_guess_index = midi_game.correct_input_count = 1;
+        midi_game.correct_inputs[0] = _get_led_index_from_midi_note(midi_game.current_notes_batch[0]);
+    }
 
     if (!midi_game.current_is_simultaneous)
     {
@@ -146,12 +155,10 @@ static bool _on_process_record_midi_game(uint16_t keycode, keyrecord_t *record)
 {
 	if (!midi_game.started) return true;
 
-
 	switch (keycode)
 	{
 		case MI_OCN2 ... MI_OCTU:
-			if (midi_game.started) return false; // Forbid octave variations during the game
-			break;
+            return false; // Forbid octave variations during the game
 		case KZ_MI_GAME_REPLAY:
 			if (record->event.pressed) _play_notes_batch(true);
 			return false;
@@ -159,6 +166,8 @@ static bool _on_process_record_midi_game(uint16_t keycode, keyrecord_t *record)
 			if (record->event.pressed) _play_notes_batch(false);
 			return false;
         case MI_C ... MI_B2:
+            if (!midi_game.player_turn) return false;
+
             break; // @note: don't count correct note again if replaying it
 
 	}
@@ -174,7 +183,7 @@ static void _render_midi_game(uint16_t current_time, uint8_t led_min, uint8_t le
 	{
 		for (uint8_t i = 38; i < 45; i++)
 		{
-			RGB_MATRIX_INDICATOR_SET_COLOR(i, 0, 255, 255);
+			RGB_MATRIX_INDICATOR_SET_COLOR(i, 0, 255, 255); // Red bar is displayed when the batch is playing
 		}
 	}
 
