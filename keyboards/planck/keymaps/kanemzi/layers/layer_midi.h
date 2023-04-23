@@ -13,7 +13,7 @@
  * |------+------+------+------+------+------+------+------+------+------+------+------|
  * |  C3  |  D#3 |  F#3 |  A3  |  C4  |  D#4 |  F#4 |  A4  |  C5  |  D#5 |  F#5 |  A5  |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |██████|██████|██████| Soft | Oct- |   Sustain   | Oct+ |██████|██████| Game | Exit |
+ * |MGRepl|MGNext|██████| Soft | Oct- |   Sustain   | Oct+ |██████|██████| Game | Exit |
  * `-----------------------------------------------------------------------------------'
  */
 #define LAYER_MIDI_GRID LAYOUT_planck_grid(                                                                                         \
@@ -32,19 +32,23 @@
 }
 
 #define MI_GAME_KEY_HOLD_TIME_MS 500
-#define MI_GAME_MIN_TEMPO 60
+#define MI_GAME_MIN_TEMPO 50
 #define MI_GAME_MAX_TEMPO 400
 #define MI_GAME_TEMPO_STEPS 8
 #define MI_GAME_BATCH_MAX_LENGTH 7 // Can't be larger than 16
-#define MI_GAME_NOTE_DURATION_MS 500
-#define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 1000
-#define MI_GAME_DELAY_BETWEEN_BATCHES_MS 1000 // When answered correctly, waits for this amount of time before starting the next note batch
+#define MI_GAME_SIMULTANEOUS_PROBABILITY 40 // 30%
+#define MI_GAME_MAX_BATCH_AMPLITUDE 21 // Max tones between the lowest and highest notes of the batch
+#define MI_GAME_MAX_INTERVAL 12
+
 #define MI_GAME_MAX_MISTAKES 10 // Maximum number of mistakes before automatically switching to the next batch
 
+#define MI_GAME_NOTE_DURATION_MS 500
+#define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 1000
+#define MI_GAME_DELAY_BETWEEN_BATCHES_MS 750 // When answered correctly, waits for this amount of time before starting the next note batch
+
 /* 						Midi Game rules
- * Sequence length == 2: allows all sequence mods
- * Sequence length >= 3: forbid simultaneous notes
- *
+ * Sequence length <= 3: allows all sequence mods
+ * Sequence length > 3: forbid simultaneous notes
  *
  * Game flow:
  *
@@ -61,18 +65,10 @@
  * - At any time, if KZ_MI_GAME_REPLAY is pressed, restart loop but without timing and with the same batch
  */
 
-typedef enum
-{
-	ASCENDING = 1 << 1,
-	DESCENDING = 1 << 2,
-	SIMULTANEOUS = 1 << 3
-} midi_game_batch_flags_t;
-
 typedef struct
 {
 	uint8_t tempo : 4;
 	uint8_t notes_batch_length: 3;
-	uint8_t allowed_batch_types;
 } midi_game_config_t;
 
 void on_layer_show_midi(void);

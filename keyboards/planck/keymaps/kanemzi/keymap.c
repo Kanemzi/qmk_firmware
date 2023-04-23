@@ -40,7 +40,7 @@ layer_info_t* layers_info[] = {
 	[L_RAISE] = NULL,
 	[L_HUB] = NULL,
 	[L_MEDIA] = NULL,
-	[L_MOUSE] = NULL,
+	[L_MOUSE] = &layer_info_mouse,
 	[L_MIDI] = &layer_info_midi,
 	[L_CONFIG] = &layer_info_config
 };

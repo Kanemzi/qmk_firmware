@@ -11,16 +11,12 @@ layer_info_t layer_info_config =
 
 void on_layer_show_config(void)
 {
-#ifdef CONSOLE_ENABLE
     dprintf("[Config] Show layer");
-#endif
 }
 
 void on_layer_hide_config(void)
 {
-#ifdef CONSOLE_ENABLE
     dprintf("[Config] Hide layer");
-#endif
 }
 
 void on_layer_render_config(uint8_t led_min, uint8_t led_max)

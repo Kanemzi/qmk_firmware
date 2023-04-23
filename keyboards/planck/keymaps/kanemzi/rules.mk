@@ -1,5 +1,6 @@
 SRC += layers/layer_config.c
 SRC += layers/layer_midi.c
+SRC += layers/layer_mouse.c
 
 EXTRAFLAGS += -flto
 
