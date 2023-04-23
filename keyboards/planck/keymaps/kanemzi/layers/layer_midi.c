@@ -3,9 +3,6 @@
 static uint16_t _midi_game_key_press_time = 0;
 extern MidiDevice midi_device;
 
-void midi_on(void);
-void midi_off(void);
-
 layer_info_t layer_info_midi =
 {
     .is_predominant = false,
@@ -33,6 +30,7 @@ typedef struct
     uint16_t _delay_between_notes;
     uint16_t play_start_time; // used for multi purpose timing (waiting and timing note batches)
     uint16_t played_notes_mask;
+	bool has_muted_before_play: 1;
 
     // Player input handling
     uint8_t guessed_notes_count;
@@ -200,12 +198,18 @@ static inline bool _has_guessed_all(void)
 
 static void _play_note(uint16_t midi_keycode, bool state)
 {
+/*
 	uint8_t channel  = midi_config.channel;
 	uint8_t velocity = midi_config.velocity;
 	uint8_t note = 12 * midi_config.octave + (midi_keycode - MIDI_TONE_MIN);
-
+*/
+	keyrecord_t record;
+	record.event.pressed = state;
+	process_midi(midi_keycode, &record); // Hack to play midi notes
+/*
 	if (state) midi_send_noteon(&midi_device, channel, note, velocity);
 	else midi_send_noteoff(&midi_device, channel, note, velocity);
+*/
 }
 
 static void _update_midi_game(uint16_t current_time)
@@ -220,6 +224,12 @@ static void _update_midi_game(uint16_t current_time)
 			// Wait a bit before playing the batch (if replay requested, just start directly)
 			if (play_elapsed_time < MI_GAME_DELAY_BETWEEN_BATCHES_MS) return;
 			else play_elapsed_time -= MI_GAME_DELAY_BETWEEN_BATCHES_MS;
+		}
+
+		if (!midi_game.has_muted_before_play)
+		{
+			midi_send_cc(&midi_device, midi_config.channel, 120, 0);
+			midi_game.has_muted_before_play = true;
 		}
 
         // Play and release the notes in the current batch
@@ -257,6 +267,7 @@ static void _play_notes_batch(bool replay)
 	midi_game.player_turn = false;
 	midi_game.is_replaying = replay;
 	midi_game.play_start_time = timer_read();
+	midi_game.has_muted_before_play = false;
 
 	if (!replay) // If not replaying, start a new round
 	{
@@ -291,7 +302,6 @@ static void _play_notes_batch(bool replay)
     }
 
     midi_game.played_notes_mask = 0;
-	midi_send_cc(&midi_device, midi_config.channel, 0x7B, 0);
 }
 
 static void _start_midi_game(void)
@@ -301,7 +311,7 @@ static void _start_midi_game(void)
     srand(timer_read32()); // Set a random seed for the game
 
 	midi_config.octave = MI_OC2 - MIDI_OCTAVE_MIN;
-	midi_send_cc(&midi_device, midi_config.channel, 0x7B, 0);
+	midi_send_cc(&midi_device, midi_config.channel, 120, 0);
 
 	dprintf("[Midi Game] Started\n");
 
@@ -312,6 +322,7 @@ static void _stop_midi_game(void)
 {
 	if (!midi_game.started) return;
 	midi_game.started = false;
+	midi_send_cc(&midi_device, midi_config.channel, 120, 0);
 
 	dprintf("[Midi Game] Stopped\n");
 }
@@ -374,10 +385,9 @@ static bool _on_process_record_midi_game(uint16_t keycode, keyrecord_t *record)
 			if (record->event.pressed) _play_notes_batch(false);
 			return false;
         case MI_C ... MI_B2:
-            if (!midi_game.player_turn) return false;
-				if (record->event.pressed) _handle_guess(keycode);
-            break;
-
+			if (midi_game.player_turn)
+				_handle_guess(keycode);
+			break;
 	}
 
     return true;
@@ -388,6 +398,7 @@ static void _render_midi_game(uint16_t current_time, uint8_t led_min, uint8_t le
 	if (!midi_game.started) return;
 
 	// Hide useless inputs (octaves)
+	RGB_MATRIX_INDICATOR_SET_COLOR(39, 0, 0, 0);
 	RGB_MATRIX_INDICATOR_SET_COLOR(40, 0, 0, 0);
 	RGB_MATRIX_INDICATOR_SET_COLOR(42, 0, 0, 0);
 
