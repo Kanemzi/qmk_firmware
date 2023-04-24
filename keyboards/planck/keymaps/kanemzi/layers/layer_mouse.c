@@ -1,4 +1,5 @@
 #include "layer_mouse.h"
+#include "../kanemzi_utils.h"
 
 layer_info_t layer_info_mouse =
 {
@@ -47,14 +48,14 @@ void on_layer_render_mouse(uint8_t led_min, uint8_t led_max)
 	if (_wheel_mode_enabled)
 	{
 		// Indicators for wheel enabled
-		RGB_MATRIX_INDICATOR_SET_COLOR(40, 255, 255, 255);
-		RGB_MATRIX_INDICATOR_SET_COLOR(42, 255, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(40, 255, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(42, 255, 255, 255);
 
 		// Indicator for wheel direction keys
-		RGB_MATRIX_INDICATOR_SET_COLOR(8,  255, 255, 255);
-		RGB_MATRIX_INDICATOR_SET_COLOR(19, 255, 255, 255);
-		RGB_MATRIX_INDICATOR_SET_COLOR(20, 255, 255, 255);
-		RGB_MATRIX_INDICATOR_SET_COLOR(21, 255, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(8,  255, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(19, 255, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(20, 255, 255, 255);
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(21, 255, 255, 255);
 	}
 }
 

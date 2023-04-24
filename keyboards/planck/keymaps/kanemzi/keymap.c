@@ -10,6 +10,8 @@
 #include "layers/layer_midi.h"
 #include "layers/layer_config.h"
 
+#include "kanemzi_utils.h"
+
 #include "sendstring_french.h"
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -133,19 +135,16 @@ static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
 		const uint8_t b = pgm_read_byte(&ledmap[layer][i][2]);
 
 		if (!r && !g && !b)
-		{
-		    rgb_matrix_set_color(i, 0, 0, 0);
-		}
+			rgb_matrix_set_color(i, 0, 0, 0);
 		else
-		{
-		    float lum = (float) rgb_matrix_config.hsv.v / UINT8_MAX;
-		    rgb_matrix_set_color(i, lum * r, lum * g, lum * b);
-		}
+		    rgb_matrix_set_color(i, g_brightness_value * r, g_brightness_value * g, g_brightness_value * b);
 	}
 }
 
-void rgb_matrix_indicators_user(void)
+bool rgb_matrix_indicators_user(void)
 {
+	update_global_brightness();
+
     // Add a blinking led when the debug mode is enabled
     static bool debug_led_state = false;
     if (debug_enable)
@@ -164,6 +163,8 @@ void rgb_matrix_indicators_user(void)
         debug_led_state = false;
         planck_ez_left_led_off();
     }
+
+	return true;
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max)
@@ -223,6 +224,10 @@ void keyboard_post_init_user(void)
     user_config.raw = eeconfig_read_user();
 	user_config.windows_unicode_fallback = true; // Enabled by default until the value is saved in EEPROM
     rgb_matrix_enable();
+
+	planck_ez_left_led_level(48);
+	planck_ez_left_led_off();
+	update_global_brightness();
 }
 
 void send_windows_alt_sequence(uint16_t keycode)

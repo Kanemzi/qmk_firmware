@@ -1,5 +1,7 @@
 #include "layer_midi.h"
 
+#include "../kanemzi_utils.h"
+
 static uint16_t _midi_game_key_press_time = 0;
 extern MidiDevice midi_device;
 
@@ -38,6 +40,7 @@ typedef struct
 	uint16_t guessed_notes_mask; // Bit is set to 1 when the note was found
     uint8_t wrong_notes_count;
     uint8_t wrong_notes_indexes[MI_GAME_MAX_MISTAKES];
+	uint16_t next_round_time; // When != 0, will skip to next round at a specific time
 } midi_game_data_t;
 
 typedef enum
@@ -202,7 +205,7 @@ static void _play_note(uint16_t midi_keycode, bool state)
 }
 
 // Stop all the notes that are currently playing from the batch player
-static void _stop_all_played_batch_notes()
+static void _stop_all_played_batch_notes(void)
 {
     // Clean all the remaining notes from batch playing
     if (midi_game.played_notes_mask != 0)
@@ -215,6 +218,52 @@ static void _stop_all_played_batch_notes()
         }
         midi_game.played_notes_mask = 0;
     }
+}
+
+static void _play_notes_batch(bool replay)
+{
+	midi_game.player_turn = false;
+	midi_game.is_replaying = replay;
+	midi_game.play_start_time = timer_read();
+	midi_game.next_round_time = 0;
+	midi_game.has_muted_before_play = false;
+
+	_stop_all_played_batch_notes();
+
+	if (!replay) // If not replaying, start a new round
+	{
+		_generate_random_note_batch(midi_game.current_notes_batch, &midi_game.current_is_simultaneous);
+        midi_game.wrong_notes_count = midi_game.guessed_notes_count = 0;
+		midi_game.guessed_notes_mask = 0;
+		memset(midi_game.wrong_notes_indexes, UINT8_MAX, sizeof(midi_game.wrong_notes_indexes));
+        midi_game._note_duration = midi_game.current_is_simultaneous ? MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS : MI_GAME_NOTE_DURATION_MS;
+
+		// Update led indicator for the first note reference
+		uint16_t ref_note = midi_game.current_notes_batch[0];
+		if (midi_game.current_is_simultaneous)
+		{
+			// If simultaneous, the indicator is the lowest note
+			for (uint8_t i = 0; i < midi_game.config.notes_batch_length; i++)
+				if (midi_game.current_notes_batch[i] < ref_note) ref_note = midi_game.current_notes_batch[i];
+		}
+		_first_note_led_index = _get_led_index_from_midi_note(ref_note);
+		midi_game.has_won = false; // New turn, reset the won state
+	}
+
+	// Compute the note delay for the next batch (need to recompute on replay in case the BPM was changed)
+    if (!midi_game.current_is_simultaneous)
+    {
+        const uint16_t bpm = ((float) midi_game.config.tempo / (MI_GAME_TEMPO_STEPS - 1)) * (MI_GAME_MAX_TEMPO - MI_GAME_MIN_TEMPO) + MI_GAME_MIN_TEMPO;
+        midi_game._delay_between_notes = 60000 / bpm;
+        dprintf("[Midi Game] Playing note batch at %d BPM (%dms)\n", bpm, midi_game._delay_between_notes);
+    }
+    else
+    {
+        midi_game._delay_between_notes = 0;
+        dprintf("[Midi Game] Playing simultaneous notes batch\n");
+    }
+
+    midi_game.played_notes_mask = 0;
 }
 
 static void _update_midi_game(uint16_t current_time)
@@ -260,55 +309,16 @@ static void _update_midi_game(uint16_t current_time)
         // Detect when we are done playing the batch
         if (play_elapsed_time >= midi_game._note_duration && midi_game.played_notes_mask == 0)
         {
-			if (midi_game.has_won) midi_game.has_won = false; // New turn, reset the won state
             midi_game.player_turn = true;
+			midi_game.is_replaying = false;
 			dprintf("[Midi Game] Waiting for player input\n");
         }
 	}
-}
-
-static void _play_notes_batch(bool replay)
-{
-	midi_game.player_turn = false;
-	midi_game.is_replaying = replay;
-	midi_game.play_start_time = timer_read();
-
-	midi_game.has_muted_before_play = false;
-    _stop_all_played_batch_notes();
-
-	if (!replay) // If not replaying, start a new round
+	else if (midi_game.next_round_time != 0)
 	{
-		_generate_random_note_batch(midi_game.current_notes_batch, &midi_game.current_is_simultaneous);
-        midi_game.wrong_notes_count = midi_game.guessed_notes_count = 0;
-		midi_game.guessed_notes_mask = 0;
-		memset(midi_game.wrong_notes_indexes, UINT8_MAX, sizeof(midi_game.wrong_notes_indexes));
-        midi_game._note_duration = midi_game.current_is_simultaneous ? MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS : MI_GAME_NOTE_DURATION_MS;
-
-		// Update led indicator for the first note reference
-		uint16_t ref_note = midi_game.current_notes_batch[0];
-		if (midi_game.current_is_simultaneous)
-		{
-			// If simultaneous, the indicator is the lowest note
-			for (uint8_t i = 0; i < midi_game.config.notes_batch_length; i++)
-				if (midi_game.current_notes_batch[i] < ref_note) ref_note = midi_game.current_notes_batch[i];
-		}
-		_first_note_led_index = _get_led_index_from_midi_note(ref_note);
+		if (current_time > midi_game.next_round_time)
+		    _play_notes_batch(false);
 	}
-
-	// Compute the note delay for the next batch (need to recompute on replay in case the BPM was changed)
-    if (!midi_game.current_is_simultaneous)
-    {
-        const uint16_t bpm = ((float) midi_game.config.tempo / (MI_GAME_TEMPO_STEPS - 1)) * (MI_GAME_MAX_TEMPO - MI_GAME_MIN_TEMPO) + MI_GAME_MIN_TEMPO;
-        midi_game._delay_between_notes = 60000 / bpm;
-        dprintf("[Midi Game] Playing note batch at %d BPM (%dms)\n", bpm, midi_game._delay_between_notes);
-    }
-    else
-    {
-        midi_game._delay_between_notes = 0;
-        dprintf("[Midi Game] Playing simultaneous notes batch\n");
-    }
-
-    midi_game.played_notes_mask = 0;
 }
 
 static void _start_midi_game(void)
@@ -358,6 +368,7 @@ static void _handle_guess(uint16_t midi_keycode)
 			printf("[Midi Game] * Repeat mistake on led %d\n", guess_led_index);
 			break;
 		case Invalid:
+			if (midi_game.wrong_notes_count == MI_GAME_MAX_MISTAKES) break;
 			midi_game.wrong_notes_indexes[midi_game.wrong_notes_count] = guess_led_index;
 			midi_game.wrong_notes_count++;
 			printf("[Midi Game] * New mistake on led %d (%d mistakes in total)\n", guess_led_index, midi_game.wrong_notes_count);
@@ -368,15 +379,13 @@ static void _handle_guess(uint16_t midi_keycode)
 	{
 		// Too many mistakes, skipping the level
 		midi_game.has_won = false;
-		_play_notes_batch(false);
+		midi_game.next_round_time = timer_read() + MI_GAME_DELAY_AFTER_CORRECT_ANSWER;
 		printf("[Midi Game] *** Too many mistakes, skipping... ***\n");
 	}
 	else if (_has_guessed_all())
 	{
 		midi_game.has_won = true;
-        // @todo check if necessary
-        wait_ms(MI_GAME_DELAY_AFTER_CORRECT_ANSWER); // Don't stop the notes immediately, so we can hear the answer
-		_play_notes_batch(false);
+		midi_game.next_round_time = timer_read() + MI_GAME_DELAY_AFTER_CORRECT_ANSWER;
 		printf("[Midi Game] *** All notes found ! ***\n");
 	}
 }
@@ -415,41 +424,38 @@ static void _render_midi_game(uint16_t current_time, uint8_t led_min, uint8_t le
 
 	if (_first_note_led_index != UINT8_MAX && (midi_game.player_turn || midi_game.played_notes_mask != 0))
 	{
-		RGB_MATRIX_INDICATOR_SET_COLOR(_first_note_led_index, 255, 255, 0); // Ref note indicator
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(_first_note_led_index, 255, 255, 0); // Ref note indicator
 	}
 
-	if (!midi_game.player_turn)
+	if (midi_game.next_round_time != 0)
 	{
-		if (midi_game.is_replaying)
-		{
-			for (uint8_t i = 38; i < 45; i++)
-				RGB_MATRIX_INDICATOR_SET_COLOR(i, 255, 128, 0); // Orange bar is displayed when the batch is replaying
-		}
-		else
-		{
-			uint8_t won_col = midi_game.has_won ? 255 : 0;
-			for (uint8_t i = 38; i < 45; i++)
-				RGB_MATRIX_INDICATOR_SET_COLOR(i, 255 - won_col, won_col, 0); // Bar is displayed when new batch is playing
-		}
+		uint8_t won_col = midi_game.has_won ? 255 : 0;
+		for (uint8_t i = 38; i < 45; i++)
+			RGB_MATRIX_INDICATOR_SET_COLOR_V(i, 255 - won_col, won_col, 0); // Bar is displayed when new batch is playing
+	}
+	else if (midi_game.is_replaying)
+	{
+		for (uint8_t i = 38; i < 45; i++)
+			RGB_MATRIX_INDICATOR_SET_COLOR_V(i, 255, 128, 0); // Orange bar is displayed when the batch is replaying
 	}
 
 	if (midi_game.player_turn || midi_game.is_replaying) // While the player is guessing, show correct notes & mistakes
 	{
 		for (uint8_t i = 0; i < midi_game.wrong_notes_count; i++)
-			RGB_MATRIX_INDICATOR_SET_COLOR(midi_game.wrong_notes_indexes[i], 255, 0, 0); // Display wrong notes
+			RGB_MATRIX_INDICATOR_SET_COLOR_V(midi_game.wrong_notes_indexes[i], 255, 0, 0); // Display wrong notes
 
 		for (uint8_t i = 0; i < midi_game.config.notes_batch_length; i++)
 		{
 			if(_is_note_guessed(i))
 			{
 				uint8_t index = _get_led_index_from_midi_note(midi_game.current_notes_batch[i]);
-				RGB_MATRIX_INDICATOR_SET_COLOR(index, 0, 255, 0); // Display correct notes
+				RGB_MATRIX_INDICATOR_SET_COLOR_V(index, 0, 255, 0); // Display correct notes
 			}
 		}
-	}l
-	RGB_MATRIX_INDICATOR_SET_COLOR(45, 255, 0, 0); // Midi Game status led
-	RGB_MATRIX_INDICATOR_SET_COLOR(36, 255, 128, 0); // Replay button
-	RGB_MATRIX_INDICATOR_SET_COLOR(37, 255, 255, 0); // Next button
+	}
+	RGB_MATRIX_INDICATOR_SET_COLOR_V(45, 255, 0, 0); // Midi Game status led
+	RGB_MATRIX_INDICATOR_SET_COLOR_V(36, 255, 128, 0); // Replay button
+	RGB_MATRIX_INDICATOR_SET_COLOR_V(37, 255, 255, 0); // Next button
 }
 
 void on_layer_show_midi(void)
@@ -484,7 +490,7 @@ void on_layer_render_midi(uint8_t led_min, uint8_t led_max)
 	}
 	else if (_midi_game_key_press_time > 0 && TIMER_DIFF_16(now, _midi_game_key_press_time) >= MI_GAME_KEY_HOLD_TIME_MS)
 	{
-		RGB_MATRIX_INDICATOR_SET_COLOR(45, 255, 255, 0); // Midi Game button confirm
+		RGB_MATRIX_INDICATOR_SET_COLOR_V(45, 255, 255, 0); // Midi Game button confirm
 	}
 }
 

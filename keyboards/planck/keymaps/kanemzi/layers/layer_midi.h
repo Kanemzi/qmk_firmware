@@ -5,6 +5,7 @@
 #include "../constants.h"
 #include "layers/layers.h"
 
+
 /* Midi Layer (accordion keyboard layout)
  * ,-----------------------------------------------------------------------------------.
  * |  D3  |  F3  |  G#3 |  B3  |  D4  |  F4  |  G#4 |  B4  |  D5  |  F5  |  G#5 |  B5  |
@@ -44,8 +45,8 @@
 
 #define MI_GAME_NOTE_DURATION_MS 500
 #define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 1000
-#define MI_GAME_DELAY_BETWEEN_BATCHES_MS 750 // When answered correctly, waits for this amount of time before starting the next note batch
-#define MI_GAME_DELAY_AFTER_CORRECT_ANSWER 500
+#define MI_GAME_DELAY_BETWEEN_BATCHES_MS 500 // When answered correctly, waits for this amount of time before starting the next note batch
+#define MI_GAME_DELAY_AFTER_CORRECT_ANSWER 1000
 
 /* 						Midi Game rules
  * Sequence length <= 3: allows all sequence mods
