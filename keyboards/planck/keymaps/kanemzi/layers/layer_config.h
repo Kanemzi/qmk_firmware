@@ -7,27 +7,27 @@
 
 /* Config Layer (persistent settings)
  * ,-----------------------------------------------------------------------------------.
- * | Save |██████|██████|██████|██████|██████|██████| Spd- | Spd+ |██████|██████| Reset|
+ * | Save |██████|██████|██████|██████|██████|██████|██████|██████|██████|██████| Reset|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |██████|██████|██████|██████|██████|██████|██████| Hue- | Hue+ |██████|SwAnim|██████|
+ * |██████|██████|██████|██████|██████|██████|██████| Hue- | Sat+ | Lum+ |██████|██████|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |██████|██████| NKRO | Debug| UcMod|██████|██████| Sat- | Sat+ |██████|  Zen |██████|
+ * |██████|██████| NKRO | Debug| UcMod|██████|██████| Hue- | Sat- | Lum- |██████|██████|
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |██████|██████|██████|██████|██████|█████████████| Lum- | Lum+ |██████|██████| Exit |
+ * |██████|██████|██████|██████|██████|█████████████|██████|██████|██████|██████| Exit |
  * `-----------------------------------------------------------------------------------'
  */
-#define LAYER_CONFIG_GRID LAYOUT_planck_grid(                                                                                            \
-    KZ_CFG_SAVE, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_SPD, RGB_SPI, XXXXXXX, XXXXXXX,            QK_BOOT, \
-    XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_HUD, RGB_HUI, XXXXXXX, RGB_MOD,            XXXXXXX, \
-    _______,     XXXXXXX, NK_TOGG, DB_TOGG, UC_NEXT, XXXXXXX, XXXXXXX, RGB_SAD, RGB_SAI, XXXXXXX, TOGGLE_LAYER_COLOR, XXXXXXX, \
-    XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_VAD, RGB_VAI, XXXXXXX, XXXXXXX,            KZ_EXIT  \
+#define LAYER_CONFIG_GRID LAYOUT_planck_grid(                                                                       \
+    KZ_CFG_SAVE, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, QK_BOOT, \
+    XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, RGB_HUI, RGB_SAI, RGB_VAI, XXXXXXX, XXXXXXX, \
+    _______,     XXXXXXX, NK_TOGG, DB_TOGG, UC_NEXT, XXXXXXX, XXXXXXX, RGB_HUD, RGB_SAD, RGB_VAD, XXXXXXX, XXXXXXX, \
+    XXXXXXX,     XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KZ_EXIT  \
 )
 
-#define LAYER_CONFIG_LEDMAP {                                                          \
-    GREEN, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, PINK, CYAN, BLACK, BLACK,  RED,   \
-    BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, PINK, CYAN, BLACK, TEAL,   BLACK, \
-    BLACK, BLACK, RED,   RED,   RED,   BLACK, BLACK, PINK, CYAN, BLACK, PURPLE, BLACK, \
-    BLACK, BLACK, BLACK, BLACK, BLACK,     BLACK,    PINK, CYAN, BLACK, BLACK,  ORANGE \
+#define LAYER_CONFIG_LEDMAP {                                                           \
+    GREEN, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, RED,   \ // Leds above RBG config will be used for preview R G B
+    BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, BLACK, WHITE, WHITE, WHITE, BLACK, BLACK, \
+    BLACK, BLACK, RED,   RED,   RED,   BLACK, BLACK, PINK,  PINK,  PINK,  BLACK, BLACK, \
+    BLACK, BLACK, BLACK, BLACK, BLACK,     BLACK,    BLACK, BLACK, BLACK, BLACK, ORANGE \
 }
 
 void on_layer_show_config(void);

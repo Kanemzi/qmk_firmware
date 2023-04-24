@@ -44,7 +44,8 @@
 
 #define MI_GAME_NOTE_DURATION_MS 500
 #define MI_GAME_SIMULTANEOUS_NOTE_DURATION_MS 1000
-#define MI_GAME_DELAY_BETWEEN_BATCHES_MS 1000 // When answered correctly, waits for this amount of time before starting the next note batch
+#define MI_GAME_DELAY_BETWEEN_BATCHES_MS 750 // When answered correctly, waits for this amount of time before starting the next note batch
+#define MI_GAME_DELAY_AFTER_CORRECT_ANSWER 500
 
 /* 						Midi Game rules
  * Sequence length <= 3: allows all sequence mods

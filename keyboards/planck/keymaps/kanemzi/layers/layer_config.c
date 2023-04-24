@@ -9,6 +9,17 @@ layer_info_t layer_info_config =
     .on_process_record = on_process_record_config
 };
 
+typedef enum
+{
+    ConfigRGB =     1 << 0,
+    ConfigNKRO =    1 << 1,
+    ConfigUnicode = 1 << 2,
+} config_space_t;
+
+static uint8_t _config_space_dirty_flags;
+
+static RBG _preview_colors[3];
+
 void on_layer_show_config(void)
 {
     dprintf("[Config] Show layer");
@@ -23,19 +34,19 @@ void on_layer_render_config(uint8_t led_min, uint8_t led_max)
 {
 	if (keymap_config.nkro)
 	{
-		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 0);
+		RGB_MATRIX_INDICATOR_SET_COLOR(26, 0, 255, 0); // NKRO Enabled indicator
 	}
 
 	if (debug_enable)
 	{
-		RGB_MATRIX_INDICATOR_SET_COLOR(27, 0, 255, 0);
+		RGB_MATRIX_INDICATOR_SET_COLOR(27, 0, 255, 0); // Debug Enabled indicator
 	}
 
     if (user_config.windows_unicode_fallback)
     {
-        RGB_MATRIX_INDICATOR_SET_COLOR(28, 255, 0, 0);
+        RGB_MATRIX_INDICATOR_SET_COLOR(28, 255, 0, 0); // Unicode fallback indicator
     }
-    else switch (get_unicode_input_mode())
+    else switch (get_unicode_input_mode()) // Display unicode input method
 	{
 		case UNICODE_MODE_WINDOWS:
 			RGB_MATRIX_INDICATOR_SET_COLOR(28, 0, 0, 255);
