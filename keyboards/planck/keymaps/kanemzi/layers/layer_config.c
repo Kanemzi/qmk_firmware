@@ -6,7 +6,8 @@ layer_info_t layer_info_config =
     .on_layer_show = on_layer_show_config,
     .on_layer_hide = on_layer_hide_config,
     .on_layer_render = on_layer_render_config,
-    .on_process_record = on_process_record_config
+    .on_process_record = on_process_record_config,
+    .on_post_process_record = on_post_process_record_config
 };
 
 typedef enum
@@ -103,4 +104,12 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 			break;*/
 	}
 	return true;
+}
+
+void on_post_process_record_config(uint16_t keycode, keyrecord_t *record)
+{
+	switch (keycode)
+	{
+
+	}
 }

@@ -39,6 +39,10 @@
 
 #define RGB_MATRIX_STARTUP_SPD 60
 
+/*
+ * Front leds
+ */
+#define DEBUG_LED_BLINK_SPEED 800
 
 /*
  * Disable unsued features

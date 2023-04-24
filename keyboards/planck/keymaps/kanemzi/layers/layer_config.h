@@ -34,6 +34,7 @@ void on_layer_show_config(void);
 void on_layer_hide_config(void);
 void on_layer_render_config(uint8_t led_min, uint8_t led_max);
 bool on_process_record_config(uint16_t keycode, keyrecord_t *record);
+void on_post_process_record_config(uint16_t keycode, keyrecord_t *record);
 
 void unicode_input_mode_set_user(uint8_t input_mode);
 

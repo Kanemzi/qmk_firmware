@@ -6,7 +6,8 @@ layer_info_t layer_info_mouse =
     .on_layer_show = on_layer_show_mouse,
     .on_layer_hide = on_layer_hide_mouse,
     .on_layer_render = on_layer_render_mouse,
-    .on_process_record = on_process_record_mouse
+    .on_process_record = on_process_record_mouse,
+    .on_post_process_record = NULL
 };
 
 #define WH_MODE_KEYCODE_OFFSET 0x0C

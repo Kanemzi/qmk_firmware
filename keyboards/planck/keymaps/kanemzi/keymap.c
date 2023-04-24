@@ -144,13 +144,27 @@ static inline void set_layer_color(uint8_t led_min, uint8_t led_max, int layer)
 	}
 }
 
-/*
 void rgb_matrix_indicators_user(void)
 {
-    if (keyboard_config.disable_layer_led)
-        return;
+    // Add a blinking led when the debug mode is enabled
+    static bool debug_led_state = false;
+    if (debug_enable)
+    {
+        uint16_t now = timer_read();
+        bool expected_state = now % (DEBUG_LED_BLINK_SPEED * 2) <  DEBUG_LED_BLINK_SPEED;
+        if (debug_led_state != expected_state)
+        {
+            debug_led_state = expected_state;
+            if (debug_led_state) planck_ez_left_led_on();
+            else planck_ez_left_led_off();
+        }
+    }
+    else if (debug_led_state)
+    {
+        debug_led_state = false;
+        planck_ez_left_led_off();
+    }
 }
-*/
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max)
 {
@@ -339,8 +353,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record)
 
 	switch (keycode)
 	{
-		case KZ_ARROW: if (record->event.pressed) SEND_STRING("->");
+		case KZ_ARROW: if (record->event.pressed) SEND_STRING("->"); return false;
 	}
 
 	return true;
 }
+
+void post_process_record_user(uint16_t keycode, keyrecord_t *record)
+{
+    // Per layer custom post record handling
+	layer_info_t* predominant_layer_info = layers_info[predominant_layer];
+	if (predominant_layer_info != NULL && predominant_layer_info->on_post_process_record != NULL)
+	{
+		predominant_layer_info->on_post_process_record(keycode, record);
+	}
+}
+

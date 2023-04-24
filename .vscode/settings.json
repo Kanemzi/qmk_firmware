@@ -16,6 +16,7 @@
 		"**/*.uf2": true
 	},
     "files.associations": {
+		"*.mold": "csharp",
 		"*.h": "c",
 		"*.c": "c",
 		"*.inc": "c",
@@ -26,7 +27,8 @@
 		"utility": "c",
 		"ranges": "c",
 		"cstdlib": "c",
-		"limits": "c"
+		"limits": "c",
+		"iosfwd": "c"
 	},
     "[markdown]": {
         "editor.trimAutoWhitespace": false,
