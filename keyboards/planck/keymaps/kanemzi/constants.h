@@ -6,6 +6,7 @@ typedef enum planck_layers
 {
     L_BASE = 0,
     L_LOWER,
+    L_ALT_LOWER,
     L_RAISE,
     L_HUB,
     L_MEDIA,
@@ -23,6 +24,7 @@ enum planck_keycodes
     KZ_MI_GAME, // Start music minigame
     KZ_MI_GAME_REPLAY, // Replay the current notes sequence
     KZ_MI_GAME_NEXT, // Go to the next notes sequence (will continue automatically if answered correctly)
+    KZ_TOGGLE_ALT_LOWER, // Toggle the alternative lower layer in the config panel
 };
 
 typedef enum unicode_names
@@ -77,6 +79,7 @@ typedef union
     uint32_t raw;
     struct {
         bool windows_unicode_fallback :1; // Whether or not the keyboard should use the shitty Windows alt+decimal alternative to unicode (when possible)
+        bool use_alt_lower_layer: 1; // Whether or not we should use the alternative lower layer
     };
 } user_config_t;
 
