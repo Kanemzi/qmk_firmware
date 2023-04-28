@@ -188,7 +188,13 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max)
 layer_state_t layer_state_set_user(layer_state_t state)
 {
 	layer_state_t new_state = update_tri_layer_state(state, L_LOWER, L_RAISE, L_HUB);
+
 	planck_layers new_predominant_layer = get_highest_layer(new_state | default_layer_state);
+
+    if (user_config.use_alt_lower_layer && new_predominant_layer == L_LOWER)
+    {
+        new_predominant_layer = L_ALT_LOWER;
+    }
 
 	// If the current predominant layer changed
 	if (new_predominant_layer != predominant_layer)
@@ -223,6 +229,7 @@ void keyboard_post_init_user(void)
 {
     user_config.raw = eeconfig_read_user();
 	user_config.windows_unicode_fallback = true; // Enabled by default until the value is saved in EEPROM
+    user_config.use_alt_lower_layer = true;
     rgb_matrix_enable();
 
 	planck_ez_left_led_level(48);

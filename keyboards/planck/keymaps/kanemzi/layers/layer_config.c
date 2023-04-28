@@ -15,10 +15,21 @@ typedef enum
 {
     ConfigRGB = 0,
     ConfigNKRO,
-    ConfigUnicode
+    ConfigUnicode,
+    ConfigAltLower
 } config_space_t;
 
-// static uint8_t _config_space_dirty_flags;
+static uint8_t _config_space_dirty_flags;
+
+static void _set_config_space_dirty(config_space_t config_space)
+{
+    _config_space_dirty_flags |= (1 << config_space);
+}
+
+static bool _is_config_space_dirty(config_space_t config_space)
+{
+    return _config_space_dirty_flags & (1 << config_space) != 0;
+}
 
 // static RGB _preview_colors[3];
 
@@ -34,6 +45,11 @@ void on_layer_hide_config(void)
 
 void on_layer_render_config(uint8_t led_min, uint8_t led_max)
 {
+    if (user_config.use_alt_lower_layer)
+    {
+        RGB_MATRIX_INDICATOR_SET_COLOR_V(25, 0, 255, 0); // Alternative lower layer indicator
+    }
+
 	if (keymap_config.nkro)
 	{
 		RGB_MATRIX_INDICATOR_SET_COLOR_V(26, 0, 255, 0); // NKRO Enabled indicator
@@ -80,9 +96,11 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
         case UC_NEXT:
 			if (record->event.pressed)
 			{
+                _set_config_space_dirty(ConfigUnicode);
 				if (get_mods() & MOD_MASK_SHIFT)
 				{
 					user_config.windows_unicode_fallback ^= 1;
+
 					return false;
 				}
 				else
@@ -95,11 +113,19 @@ bool on_process_record_config(uint16_t keycode, keyrecord_t *record)
 				}
 			}
             break;
+
+        case KZ_TG_ALT_LOWER:
+			if (record->event.pressed)
+			{
+                _set_config_space_dirty(ConfigAltLower);
+                user_config.use_alt_lower_layer ^= 1;
+            }
+            return false;
 	}
 	return true;
 }
 
 void on_post_process_record_config(uint16_t keycode, keyrecord_t *record)
 {
-	// @todo process brightness here if possible 
+	// @todo process brightness here if possible
 }

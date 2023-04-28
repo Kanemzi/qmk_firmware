@@ -50,7 +50,7 @@
 #define LAYER_ALT_LOWER_LEDMAP {                                                                                                             \
     RED,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     ORANGE,     BLACK,  \
     ORANGE,  CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, CHARTREUSE, ORANGE, \
-    BLACK,   ORANGE, ORANGE, ORANGE, ORANGE, CORAL, CORAL, CORAL,   CHARTREUSE, CHARTREUSE, CHARTREUSE, CORAL, \
-    MAGENTA, BLACK,  BLACK,  BLACK,  PURPLE,     BLACK,    MAGENTA, CHARTREUSE, BLACK,      BLACK,      CORAL  \
+    BLACK,   CORAL,      CORAL,      GOLD,       GOLD,       CORAL,      CORAL,      CORAL,      CORAL,      CORAL,      CORAL,      BLACK,  \
+    MAGENTA, BLACK,      TEAL,       BLACK,      PURPLE,           BLACK,            MAGENTA,    BLACK,      BLACK,      BLACK,      CORAL   \
 }
 

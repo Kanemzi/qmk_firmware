@@ -24,7 +24,7 @@ enum planck_keycodes
     KZ_MI_GAME, // Start music minigame
     KZ_MI_GAME_REPLAY, // Replay the current notes sequence
     KZ_MI_GAME_NEXT, // Go to the next notes sequence (will continue automatically if answered correctly)
-    KZ_TOGGLE_ALT_LOWER, // Toggle the alternative lower layer in the config panel
+    KZ_TG_ALT_LOWER, // Toggle the alternative lower layer in the config panel
 };
 
 typedef enum unicode_names
